@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PostController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,12 +14,27 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// /にアクセスした場合、welcome.blade.phpが表示されるのルーティング変更
+// - Route::get('/', function () {
+// -   return view('welcome');
+// - });
+Route::get('/', [PostController::class, 'index'])
+    ->name('root');
+
+
 
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');
 
-require __DIR__.'/auth.php';
+
+// PostController設定(↑use App\Http\Controllers\PostController;つける）
+// 認証機能設定
+Route::resource('posts', PostController::class)
+    ->only(['create', 'store', 'edit', 'update', 'destroy'])
+    ->middleware('auth');
+// 非認証機能設定
+Route::resource('posts', PostController::class)
+    ->only(['show', 'index']);
+
+require __DIR__ . '/auth.php';
