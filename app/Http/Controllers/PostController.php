@@ -17,7 +17,14 @@ class PostController extends Controller
      */
     public function index()
     {
-        return view('posts.index');
+        // Post::latest()メソッドでget()メソッドで、生成したクエリでデータを取得
+        // $posts = Post::latest()->get();
+        // シンプルなページネーションを実装する場合は、simplePaginateメソッドを使用
+        // N+1問題対策↓
+        $posts = Post::with('user')->latest()->Paginate(4);
+
+
+        return view('posts.index', compact('posts'));
     }
 
     /**
@@ -108,7 +115,7 @@ class PostController extends Controller
     public function update(PostRequest $request, $id)
     {
         $post = Post::find($id);
-    // 更新権限 cannotメソッド
+        // 更新権限 cannotメソッド
         if ($request->user()->cannot('update', $post)) {
             return redirect()->route('posts.show', $post)
                 ->withErrors('自分の記事以外は更新できません');
