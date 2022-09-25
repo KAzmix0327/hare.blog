@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\CommentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
+use GuzzleHttp\Middleware;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,5 +38,10 @@ Route::resource('posts', PostController::class)
 // 非認証機能設定
 Route::resource('posts', PostController::class)
     ->only(['show', 'index']);
+
+// Commenet ルーティング設定
+Route::resource('posts.comments', CommentController::class)
+    ->only(['create', 'store', 'edit', 'update', 'destroy'])
+    ->middleware('auth');
 
 require __DIR__ . '/auth.php';
