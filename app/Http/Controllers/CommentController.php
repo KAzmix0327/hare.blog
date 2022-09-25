@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CommentRequest;
 use App\Models\Post;
 use App\Models\Comment;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 class CommentController extends Controller
 {
@@ -77,9 +77,9 @@ class CommentController extends Controller
      * @param  \App\Models\Comment  $comment
      * @return \Illuminate\Http\Response
      */
-    public function edit(Comment $comment)
+    public function edit(Post $post,comment $comment)
     {
-        //
+        return view('comments.edit', compact('post', 'comment'));
     }
 
     /**
@@ -89,9 +89,31 @@ class CommentController extends Controller
      * @param  \App\Models\Comment  $comment
      * @return \Illuminate\Http\Response
      */
-    public function update(CommentRequest $request, Comment $comment)
+    public function update(CommentRequest $request, Post $post, Comment $comment)
     {
-        //
+
+        if ($request->user()->cannot('update', $comment)) {
+            return redirect()->route('posts.show', $post)
+                ->withErrors('自分のコメント以外は更新できません');
+        }
+        
+        $comment ->fill($request->all());
+
+        // $comment->user_id = $request->user()->id;
+        // // $comment->post_id = $post->id;
+
+        try {
+        //登録
+        $comment->save();
+
+        } catch (\Throwable $th) {
+
+            return back()->withInput()->withErrors($th->getMessage());
+        }
+            //throw $th;
+        return redirect()->route('posts.show',$post)
+        ->with('notice', 'コメントを更新しました');
+
     }
 
     /**
@@ -100,8 +122,23 @@ class CommentController extends Controller
      * @param  \App\Models\Comment  $comment
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Comment $comment)
+    public function destroy(Request $request,Post $post,Comment $comment)
     {
-        //
+        if ($request->user()->cannot('delete', $comment)) {
+            return redirect()->route('posts.show', $post)
+                ->withErrors('自分のコメント以外は削除できません');
+        }
+        try {
+        //登録
+        $comment->delete();
+
+        } catch (\Exception $e) {
+
+            return back()->withInput()->withErrors($e->getMessage());
+        }
+            //throw $th;
+        return redirect()->route('posts.show',$post)
+        ->with('notice', 'コメントを削除しました');
+
     }
 }
