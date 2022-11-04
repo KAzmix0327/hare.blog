@@ -57,4 +57,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Comment::class);
     }
+// IdentityProviderモデルとUserモデルのリレーションを設定
+    public function identityProvider()
+    {
+        return $this->hasOne(IdentityProvider::class);
+    }
 }

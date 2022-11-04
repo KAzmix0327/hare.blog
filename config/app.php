@@ -174,7 +174,8 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-
+        // Socialiteを使うため追加
+        Laravel\Socialite\SocialiteServiceProvider::class,
     ],
 
     /*
